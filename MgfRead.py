@@ -48,34 +48,37 @@ def select_data():
 def select_out():
     var_out.set(filedialog.askdirectory())
 
-def parse_title(path_in, path_out):
+def parse_mgf(path_in, dir_out):
     print("reading", path_in)
-    os.makedirs(path_out, exist_ok=True)
-    path = os.path.join(path_out, os.path.basename(path_in))
-    print("writing", path)
-    out = open(path, "w")
-    lines = []
+    os.makedirs(dir_out, exist_ok=True)
+    path_out = os.path.join(dir_out, os.path.basename(path_in))
+    print("writing", path_out)
+    out = open(path_out, "w")
+    parse_msconvert(path_in, out)
+    out.close()
+    print("saved to", path_out)
+
+def parse_msconvert(path_in, out):
+    buf = []
     write = True
     for line in open(path_in).readlines():
         if not line.startswith("TITLE"):
-            lines.append(line)
+            buf.append(line)
         else:
             items = [item.strip() for item in line[6:].split(",")]
             fname, scan_start, scan_end, charge = items[0].split(" File:\"")[0].rsplit(".", maxsplit=3)
-            lines.append(f"TITLE={fname}.{scan_start}.{scan_end}.{charge}.{0}.dta\n")
+            buf.append(f"TITLE={fname}.{scan_start}.{scan_end}.{charge}.{0}.dta\n")
             write = len(charge) > 0
         if line.startswith("END IONS"):
             if write:
-                out.writelines(lines)
-            lines.clear()
+                out.writelines(buf)
+            buf.clear()
             write = True
-    out.close()
-    print("saved to", path)
 
 def run():
     btn_run.config(state="disabled")
     for data in var_data.get().split(";"):
-        parse_title(data, var_out.get())
+        parse_mgf(data, var_out.get())
     btn_run.config(state="normal")
 
 row=0
