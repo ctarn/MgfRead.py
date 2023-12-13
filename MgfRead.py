@@ -89,8 +89,10 @@ def parse_bruker(path_in, out):
     heads = []
     peaks = []
     for line in open(path_in).readlines():
-        if len(line) == 0 or line.startswith("#"):
+        if len(line) == 0:
             continue
+        elif line.startswith("#"):
+            out.write(line)
         elif line == "BEGIN IONS\n":
             charge = ""
             heads.clear()
