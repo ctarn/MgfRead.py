@@ -18,6 +18,8 @@ main.grid(column=0, row=0, padx=16, pady=8)
 
 var_data = tk.StringVar()
 var_out = tk.StringVar()
+fmts = ["msConvert", "Bruker"]
+var_fmt = tk.StringVar(value=fmts[0])
 
 class Console:
     widget = None
@@ -48,13 +50,18 @@ def select_data():
 def select_out():
     var_out.set(filedialog.askdirectory())
 
-def parse_mgf(path_in, dir_out):
+def parse_mgf(path_in, dir_out, fmt):
     print("reading", path_in)
     os.makedirs(dir_out, exist_ok=True)
     path_out = os.path.join(dir_out, os.path.basename(path_in))
     print("writing", path_out)
     out = open(path_out, "w")
-    parse_msconvert(path_in, out)
+    if fmt == "msConvert":
+        parse_msconvert(path_in, out)
+    elif fmt == "Bruker":
+        parse_bruker(path_in, out)
+    else:
+        print("unknown format")
     out.close()
     print("saved to", path_out)
 
@@ -116,13 +123,18 @@ def parse_bruker(path_in, out):
 def run():
     btn_run.config(state="disabled")
     for data in var_data.get().split(";"):
-        parse_mgf(data, var_out.get())
+        parse_mgf(data, var_out.get(), var_fmt.get())
     btn_run.config(state="normal")
 
 row=0
 ttk.Label(main, text="Data:").grid(column=0, row=row, sticky="W")
 ttk.Entry(main, textvariable=var_data, width=64).grid(column=1, row=row, sticky="WE")
 ttk.Button(main, text="Select", command=select_data).grid(column=2, row=row, sticky="W")
+
+row += 1
+ttk.Label(main, text="Format:").grid(column=0, row=row, sticky="W")
+c = ttk.Combobox(main, textvariable=var_fmt, values=fmts, state="readonly", justify="center")
+c.grid(column=1, row=row, sticky="WE")
 
 row += 1
 ttk.Label(main, text="Save to:").grid(column=0, row=row, sticky="W")
