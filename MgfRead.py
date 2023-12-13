@@ -61,10 +61,7 @@ def parse_title(path_in, path_out):
             lines.append(line)
         else:
             items = [item.strip() for item in line[6:].split(",")]
-            charge = items[0].split(" File:\"")[0].split(".")[-1]
-            fname = items[0].split(" File:\"")[1][:-3]
-            scan_start = items[1][10:-1].split()[2].split("=")[1]
-            scan_end = items[1][10:-1].split()[3].split("=")[1]
+            fname, scan_start, scan_end, charge = items[0].split(" File:\"")[0].rsplit(".", maxsplit=3)
             lines.append(f"TITLE={fname}.{scan_start}.{scan_end}.{charge}.{0}.dta\n")
             write = len(charge) > 0
         if line.startswith("END IONS"):
