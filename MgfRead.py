@@ -70,6 +70,7 @@ def parse_title(path_in, path_out):
             lines.clear()
             write = True
     out.close()
+    print("saved to", path)
 
 def run():
     btn_run.config(state="disabled")
