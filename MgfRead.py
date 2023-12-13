@@ -75,6 +75,44 @@ def parse_msconvert(path_in, out):
             buf.clear()
             write = True
 
+def parse_bruker(path_in, out):
+    fname = os.path.splitext(os.path.basename(path_in))[0]
+    scan = 0
+    charge = ""
+    heads = []
+    peaks = []
+    for line in open(path_in).readlines():
+        if len(line) == 0 or line.startswith("#"):
+            continue
+        elif line == "BEGIN IONS\n":
+            charge = ""
+            heads.clear()
+            peaks.clear()
+        elif line == "END IONS\n":
+            scan += 1
+            if len(charge) == 0:
+                continue
+            out.write("BEGIN IONS\n")
+            out.write(f"TITLE={fname}.{scan}.{scan}.{charge}.{0}.dta\n")
+            out.writelines(heads)
+            out.writelines(peaks)
+            out.write("END IONS\n")
+        elif '0' <= line[0] <= '9':
+            items = line.split()
+            peaks.append(f"{items[0]}\t{items[1]}\n")
+        elif line.startswith("TITLE="):
+            continue
+        elif line.startswith("PEPMASS="):
+            items = line[8:].split()
+            heads.append(f"PEPMASS={items[0]}\n")
+        elif line.startswith("CHARGE="):
+            charge = line.strip()[7:]
+            if charge.endswith("+") or charge.endswith("-"):
+                charge = charge[:-1]
+            heads.append(line)
+        else:
+            heads.append(line)
+
 def run():
     btn_run.config(state="disabled")
     for data in var_data.get().split(";"):
