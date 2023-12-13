@@ -7,7 +7,7 @@ To run it from the script, simply call MgfRead.py with Python:
 python3 MgfRead.py
 ```
 
-You can also copy the function named `parse_title` to run it in your own script if you don't need GUI.
+You can also copy the function such as `parse_msconvert` to run it in your own script if you don't need GUI.
 
 To build an `exe` which you can run later without Python, you should install PyInstaller first, and then run:
 ```sh
