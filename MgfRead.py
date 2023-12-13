@@ -108,7 +108,7 @@ def parse_bruker(path_in, out):
             items = line.split()
             peaks.append(f"{items[0]}\t{items[1]}\n")
         elif line.startswith("TITLE="):
-            continue
+            heads.append(f"COMMENT={line[6:]}")  # '\n' has been included
         elif line.startswith("PEPMASS="):
             items = line[8:].split()
             heads.append(f"PEPMASS={items[0]}\n")
